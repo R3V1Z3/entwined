@@ -99,11 +99,11 @@ jQuery(document).ready(function() {
         // set colors for note links based on note sections
         $('.note').each(function() {
             $(this).addClass('notenum-' + counter);
-            var bg = $(this).css('background-color');
+            //var bg = $(this).css('background-color');
             // get the note's id
             var id = $(this).attr('id');
-            $( '.c-' + id ).css('border-color', bg);
-            $( '.n-' + id ).css('background-color', bg);
+            //$( '.c-' + id ).css('border-color', bg);
+            //$( '.n-' + id ).css('background-color', bg);
             counter++;
         });
     }

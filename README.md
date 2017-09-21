@@ -1,17 +1,18 @@
 ## EntwinED
-Modular Markdown editor for Entwine
-[What’s Entwine?](#about-entwine)  
-[What’s the difference between in Entine and EntwinED?](#what-is-the-difference)
-<!-- {left:106px,top:38px,width:509px,height:131px} -->
+Modular Markdown editor for Entwine.
+[What’s Entwine?](#about-entwine)
+[Entine vs EntwinED?](#what-is-the-difference)
+<!-- {left:53px,top:34px,width:246px,height:171px} -->
 
 ## About Entwine
 Entwine is an interactive viewer for Markdown documents. It renders them in a way that lets you progress through the documents via a sleek, configurable interface.
-[What’s the difference between in Entine and EntwinED?](#what-is-the-difference)
-<!-- {left:303px,top:334px,width:256px,height:242px} -->
+[Entine vs EntwinED?](#what-is-the-difference)
+<!-- {left:196px,top:297.8000183105469px,width:326px,height:150px} -->
 
 ## What is the difference?
-Entwine is the front-end for progressing through interactive stories. EntwinED is an editor for those stories.
-<!-- {left:839px,top:181px,width:260px,height:124px} -->
+Entwine is a player or front-end for progressing through interactive stories. EntwinED is an editor for those stories.
+<!-- {left:505px,top:128px,width:344px,height:100px} -->
+
 
 # Examples <!-- {$gd_info} -->
 <!-- {$gd_help_ribbon} -->
@@ -24,4 +25,6 @@ Example Gists <!-- {$gd_gist} -->
 Themes <!-- {$gd_css} -->
 
 <!-- {$gd_toc="Contents"} -->
+
+<!-- {$gd_play} -->
 <!-- {$gd_hide} -->
