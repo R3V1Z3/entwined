@@ -1,6 +1,6 @@
 /* global jQuery, $, interact */
 jQuery(document).ready(function() {
-    
+
     var toggle_html='<span class="toggle"></span>';
 
     // attach the plugin to an element
@@ -11,14 +11,14 @@ jQuery(document).ready(function() {
     var $gd = $('#wrapper').data('gitdown');
 
     function main() {
-        
+
         position_sections();
         make_draggable();
         notize();
         register_events();
         render_connections();
     }
-    
+
     function position_sections() {
         var docwidth = $(document).width();
         var $sections = $('.section *');
@@ -39,7 +39,7 @@ jQuery(document).ready(function() {
                 }
             });
         }
-        
+
         // iterate over sections and position elements if they're at 0,0
         var counter = 0;
         var left = 0;
@@ -63,21 +63,21 @@ jQuery(document).ready(function() {
             }
         });
     }
-    
+
     function notize() {
         $('.section').each(function() {
-            
+
             var $s = $(this);
-            
+
             // quickly add a draggable class for drag method
             $s.addClass('draggable');
-            
+
             // set initial position values
             var x = $s.css('left').slice( 0, -2 );
             var y = $s.css('top').slice( 0, -2 );
             $s.attr('data-x', x);
             $s.attr('data-y', y);
-            
+
             var name = $(this).find('a.handle').attr('name');
             // check if any anchor links reference this setion and add respective classes if so
             $(".content a[href*=#]").each(function() {
@@ -94,7 +94,7 @@ jQuery(document).ready(function() {
                 }
             });
         });
-        
+
         var counter = 1;
         // set colors for note links based on note sections
         $('.note').each(function() {
@@ -107,7 +107,7 @@ jQuery(document).ready(function() {
             counter++;
         });
     }
-    
+
     function render_connections() {
         if ( $('connection').length === 0 ) {
             $( '.section .content [class^="n"]' ).each(function() {
@@ -124,7 +124,7 @@ jQuery(document).ready(function() {
             $('.section .content [class^="n"]').connections('update');
         }
     }
-    
+
     function make_draggable() {
         // target elements with the "draggable" class
         interact('.draggable')//.allowFrom('.handle-heading')
@@ -139,7 +139,7 @@ jQuery(document).ready(function() {
             },
             // enable autoScroll
             autoScroll: true,
-            
+
             // call this function on every dragmove event
             onmove: dragMoveListener,
             // call this function on every dragend event
@@ -154,20 +154,20 @@ jQuery(document).ready(function() {
             var target = event.target,
                 x = (parseFloat(target.getAttribute('data-x')) || 0),
                 y = (parseFloat(target.getAttribute('data-y')) || 0);
-            
+
             // update the element's style
             target.style.width  = event.rect.width + 'px';
             target.style.height = event.rect.height + 'px';
-            
+
             // translate when resizing from top or left edges
             x += event.deltaRect.left;
             y += event.deltaRect.top;
-            
+
             target.setAttribute('data-x', x);
             target.setAttribute('data-y', y);
             render_connections();
         });
-        
+
         function dragMoveListener (event) {
             var target = event.target,
             // keep the dragged position in the data-x/data-y attributes
@@ -176,63 +176,48 @@ jQuery(document).ready(function() {
 
             $(target).css('top', y + 'px');
             $(target).css('left', x + 'px');
-            
+
             // update the position attributes
             target.setAttribute('data-x', x);
             target.setAttribute('data-y', y);
             render_connections();
         }
     }
-    
+
     function open_export() {
-        
+
         // open new window
         var xWindow = window.open('export');
         var content = '';
         var newline = '\n\n'; //'<br/>';
-        
-        // clone wrapper for interaction with export content
-        var $export = $('#wrapper').clone();
-        $export.attr('id', 'export');
-        $('body').prepend($export);
-        
-        $('#export a.handle').each(function(){
-            var text = $(this).text();
-            $(this).text( '## ' + text + newline );
-        });
-        
-        $('#export .content a[href*=#]').each(function(){
-            var text = $(this).text();
-            var link = $(this).attr('href');
-            $(this).text( '[' + text + '](' + link + ')' );
-        });
-        
-        $('#export li').each(function(){
-            var text = $(this).text();
-            $(this).text( '- ' + text + newline );
-        });
-        
-        // iterate over all sections to get content
-        $('#export .section').each(function() {
 
-            content += $(this).text();
-            
+        // iterate over all sections to get content
+        $('.inner *').each(function() {
+
+            var data = $(this).data();
+            for(var i in data){
+                content += i + ': ' + data[i];
+            }
+            // if ( md == undefined ) {
+            //     console.log('undefined md');
+            // } else content += md;
+
             // get section attributes
-            var attr = '';
-            var px = 'px';
-            attr += 'left:' + $(this).position().left + px;
-            attr += ',top:' + $(this).position().top + px;
-            attr += ',width:' + $(this).width() + px;
-            attr += ',height:' + $(this).height() + px;
-            
-            content += newline;
-            content += '&lt;!-- {' + attr + '} -->';
-            content += newline + newline;
+            // var attr = '';
+            // var px = 'px';
+            // attr += 'left:' + $(this).position().left + px;
+            // attr += ',top:' + $(this).position().top + px;
+            // attr += ',width:' + $(this).width() + px;
+            // attr += ',height:' + $(this).height() + px;
+            //
+            // content += newline;
+            // content += '&lt;!-- {' + attr + '} -->';
+            content += newline;// + newline;
         });
         xWindow.document.write( content.replace(/\n\n/g, '<br/>') );
         $export.remove();
     }
-    
+
     function register_events() {
         // Key events
         $(document).keyup(function(e) {
@@ -241,8 +226,8 @@ jQuery(document).ready(function() {
                 open_export();
             }
         });
-        
+
     }
-    
+
 
 });
