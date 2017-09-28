@@ -11,9 +11,7 @@ jQuery(document).ready(function() {
     var $gd = $('#wrapper').data('gitdown');
 
     function main() {
-
         position_sections();
-        make_draggable();
         notize();
         register_events();
         render_connections();
@@ -94,18 +92,6 @@ jQuery(document).ready(function() {
                 }
             });
         });
-
-        var counter = 1;
-        // set colors for note links based on note sections
-        $('.note').each(function() {
-            $(this).addClass('notenum-' + counter);
-            //var bg = $(this).css('background-color');
-            // get the note's id
-            var id = $(this).attr('id');
-            //$( '.c-' + id ).css('border-color', bg);
-            //$( '.n-' + id ).css('background-color', bg);
-            counter++;
-        });
     }
 
     function render_connections() {
@@ -125,17 +111,88 @@ jQuery(document).ready(function() {
         }
     }
 
-    function make_draggable() {
+    function dragMoveListener (event) {
+        var target = event.target,
+        // keep the dragged position in the data-x/data-y attributes
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+        $(target).css('top', y + 'px');
+        $(target).css('left', x + 'px');
+
+        // update the position attributes
+        target.setAttribute('data-x', x);
+        target.setAttribute('data-y', y);
+        render_connections();
+    }
+
+    function open_export() {
+
+        // open new window
+        var xWindow = window.open('export');
+        var content = '<pre>';
+        var newline = '\n'; //'<br/>';
+
+        // iterate over all sections to get content
+        $('.section').each(function() {
+
+            // get content
+            content += toMarkdown( $(this).html() );
+
+            //get section attributes
+            var attr = '';
+            var px = 'px';
+            attr += 'left:' + $(this).position().left + px;
+            attr += ',top:' + $(this).position().top + px;
+            attr += ',width:' + $(this).width() + px;
+            attr += ',height:' + $(this).height() + px;
+            
+            content += newline + newline;
+            content += '&lt;!-- {' + attr + '} -->';
+            content += newline + newline;
+        });
+        content += newline + '</pre>';
+        xWindow.document.write( content.replace(/\n\n/g, '<br/>') );
+    }
+
+    function register_events() {
+        // Key events
+        $(document).keyup(function(e) {
+            if( e.which == 88 ) {
+                // x for export
+                open_export();
+            }
+        });
+
+        $('.content').click(function(){
+            var content = '';
+            //var $h = $(this).parent().find(':header');
+            //content += toMarkdown( $h.html() );
+            content += toMarkdown( $(this).html() );
+            console.log(content);
+        })
+
+        $('.n-reference').mouseenter( function(){
+            var bg = $(this).css('background');
+            var href = $(this).attr('href');
+            $(href).css( 'background', bg );
+        });
+        $('.n-reference').mouseleave( function(){
+            var href = $(this).attr('href');
+            var bg = $('.section').css('background');
+            $(href).css( 'background', bg );
+        });
+
         // target elements with the "draggable" class
-        interact('.draggable')//.allowFrom('.handle-heading')
+        interact('.draggable').allowFrom('.handle-heading')
             .draggable({
                 // enable inertial throwing
                 inertia: false,
                 // keep the element within the area of it's parent
                 restrict: {
-                  restriction: 'self',
-                  endOnly: true,
-                  elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+                restriction: 'self',
+                endOnly: true,
+                elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
             },
             // enable autoScroll
             autoScroll: true,
@@ -145,8 +202,9 @@ jQuery(document).ready(function() {
             // call this function on every dragend event
             onend: function (event) {
             }
-        })
-        .resizable({
+        });
+
+        interact('.section').resizable({
             preserveAspectRatio: false,
             edges: { left: true, right: true, bottom: true, top: true }
             })
@@ -166,65 +224,6 @@ jQuery(document).ready(function() {
             target.setAttribute('data-x', x);
             target.setAttribute('data-y', y);
             render_connections();
-        });
-
-        function dragMoveListener (event) {
-            var target = event.target,
-            // keep the dragged position in the data-x/data-y attributes
-            x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
-            y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-            $(target).css('top', y + 'px');
-            $(target).css('left', x + 'px');
-
-            // update the position attributes
-            target.setAttribute('data-x', x);
-            target.setAttribute('data-y', y);
-            render_connections();
-        }
-    }
-
-    function open_export() {
-
-        // open new window
-        var xWindow = window.open('export');
-        var content = '';
-        var newline = '\n\n'; //'<br/>';
-
-        // iterate over all sections to get content
-        $('.inner *').each(function() {
-
-            var data = $(this).data();
-            for(var i in data){
-                content += i + ': ' + data[i];
-            }
-            // if ( md == undefined ) {
-            //     console.log('undefined md');
-            // } else content += md;
-
-            // get section attributes
-            // var attr = '';
-            // var px = 'px';
-            // attr += 'left:' + $(this).position().left + px;
-            // attr += ',top:' + $(this).position().top + px;
-            // attr += ',width:' + $(this).width() + px;
-            // attr += ',height:' + $(this).height() + px;
-            //
-            // content += newline;
-            // content += '&lt;!-- {' + attr + '} -->';
-            content += newline;// + newline;
-        });
-        xWindow.document.write( content.replace(/\n\n/g, '<br/>') );
-        $export.remove();
-    }
-
-    function register_events() {
-        // Key events
-        $(document).keyup(function(e) {
-            if( e.which == 88 ) {
-                // x for export
-                open_export();
-            }
         });
 
     }

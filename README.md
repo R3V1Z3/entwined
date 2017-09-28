@@ -1,12 +1,12 @@
 ## EntwinED
 Modular Markdown editor for Entwine.
-[What’s Entwine?](#about-entwine)
-[Entine vs EntwinED?](#what-is-the-difference)
+- [What’s Entwine?](#about-entwine)
+- [Entine vs EntwinED?](#what-is-the-difference)
 <!-- {left:53px,top:34px,width:246px,height:171px} -->
 
 ## About Entwine
 Entwine is an interactive viewer for Markdown documents. It renders them in a way that lets you progress through the documents via a sleek, configurable interface.
-[Entine vs EntwinED?](#what-is-the-difference)
+- [Entine vs EntwinED?](#what-is-the-difference)
 <!-- {left:196px,top:297.8000183105469px,width:326px,height:150px} -->
 
 ## What is the difference?
