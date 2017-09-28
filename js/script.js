@@ -12,6 +12,7 @@ jQuery(document).ready(function() {
 
     function main() {
         position_sections();
+        configure_sections();
         notize();
         register_events();
         render_connections();
@@ -62,9 +63,9 @@ jQuery(document).ready(function() {
         });
     }
 
-    function notize() {
+    function configure_sections() {
         $('.section').each(function() {
-
+            
             var $s = $(this);
 
             // quickly add a draggable class for drag method
@@ -75,8 +76,13 @@ jQuery(document).ready(function() {
             var y = $s.css('top').slice( 0, -2 );
             $s.attr('data-x', x);
             $s.attr('data-y', y);
+        });
+    }
 
-            var name = $(this).find('a.handle').attr('name');
+    function notize() {
+        $('.section').each(function() {
+            var $s = $(this);
+            var name = $s.find('a.handle').attr('name');
             // check if any anchor links reference this setion and add respective classes if so
             $(".content a[href*=#]").each(function() {
                 var $link = $(this);
@@ -95,35 +101,18 @@ jQuery(document).ready(function() {
     }
 
     function render_connections() {
-        if ( $('connection').length === 0 ) {
-            $( '.section .content [class^="n"]' ).each(function() {
-                var classes = $(this).attr('class');
-                var to = classes.substr(classes.indexOf("n-") + 2).split(' ')[0];
-                // get note's number from parent
-                classes = $('.note-' + to).attr("class");
-                var notenum = classes.substr(classes.indexOf("notenum-") + 8).split(' ')[0];
-                // draw connection from $(this) to [to] and add class c- to connection border for color
-                $(this).connections({ to: '.note-' + to , 'class': 'c-' + notenum});
-            });
-        } else {
-            // update connections
-            $('.section .content [class^="n"]').connections('update');
-        }
-    }
-
-    function dragMoveListener (event) {
-        var target = event.target,
-        // keep the dragged position in the data-x/data-y attributes
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
-
-        $(target).css('top', y + 'px');
-        $(target).css('left', x + 'px');
-
-        // update the position attributes
-        target.setAttribute('data-x', x);
-        target.setAttribute('data-y', y);
-        render_connections();
+        $('connection').remove();
+        $( '.section .content .n-reference' ).each(function() {
+            var classes = $(this).attr('class');
+            // remove n-reference class
+            var to = classes.split('n-reference')[0].trim();
+            to = to.substr(2);
+            // get note's referent
+            classes = $('.note-' + to).attr("class");
+            var notenum = classes.substr(classes.indexOf("notenum-") + 8).split(' ')[0];
+            // draw connection from $(this) to [to] and add class c- to connection border for color
+            $(this).connections({ to: '.note-' + to});// , 'class': 'c-' + notenum});
+        });
     }
 
     function open_export() {
@@ -154,6 +143,59 @@ jQuery(document).ready(function() {
         content += newline + '</pre>';
         xWindow.document.write( content.replace(/\n\n/g, '<br/>') );
     }
+    
+    function render_editor(id) {
+        // remove any existing editors first
+        $('.editor').remove();
+
+        var $s = $('.section#' + id);
+        var left = $s.position().left;
+        var top = $s.position().top;
+        var width = $s.width();
+        var height = $s.height();
+        var content = toMarkdown( $s.find('.content').html() );
+        
+        var html = '<div class="editor" data-section="' + id + '">';
+        html += '<pre class="md">';
+        html += content;
+        html += '</pre>';
+        html += '<textarea class="editor-content" />';
+        html += '</div>';
+        $('.inner').append(html);
+        var $editor = $('.editor');
+        //$editor.width( width );
+        $editor.css( { top: top, left: left + width + 50,
+        width: width, height: height } );
+        $('.editor-content').val( $('.md').text() );
+
+        // event handler for editor content changes
+        $('.editor-content').change(function() {
+            content = $('.editor-content').val();
+            var container = '.section#' + id + ' .content';
+            $gd.render( content, container );
+            notize();
+            render_connections();
+        });
+        $('.editor-content').keyup(function() {
+            content = $('.editor-content').val();
+            var container = '.section#' + id + ' .content';
+            $gd.render( content, container );
+            notize();
+            render_connections();
+        });
+
+        // hide the editor if anything else is clicked
+        $( '.inner' ).on('click', function (e) {
+            if ( $(e.target).closest(".section").length === 0 ) {
+                if ( $(e.target).closest(".editor").length === 0 ) {
+                    $('.editor' ).remove();
+                }
+            }
+        });
+
+        $('.editor .md').remove();
+        
+    }
 
     function register_events() {
         // Key events
@@ -166,11 +208,9 @@ jQuery(document).ready(function() {
 
         $('.content').click(function(){
             var content = '';
-            //var $h = $(this).parent().find(':header');
-            //content += toMarkdown( $h.html() );
-            content += toMarkdown( $(this).html() );
-            console.log(content);
-        })
+            var id = $(this).parent().attr('id');
+            render_editor(id);
+        });
 
         $('.n-reference').mouseenter( function(){
             var bg = $(this).css('background');
@@ -225,8 +265,21 @@ jQuery(document).ready(function() {
             target.setAttribute('data-y', y);
             render_connections();
         });
-
     }
 
+    function dragMoveListener (event) {
+        var target = event.target,
+        // keep the dragged position in the data-x/data-y attributes
+        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+        $(target).css('top', y + 'px');
+        $(target).css('left', x + 'px');
+
+        // update the position attributes
+        target.setAttribute('data-x', x);
+        target.setAttribute('data-y', y);
+        render_connections();
+    }
 
 });
