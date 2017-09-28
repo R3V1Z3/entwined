@@ -84,7 +84,7 @@ jQuery(document).ready(function() {
             var $s = $(this);
             var name = $s.find('a.handle').attr('name');
             // check if any anchor links reference this setion and add respective classes if so
-            $(".content a[href*=#]").each(function() {
+            $(".content a[href^=#]").each(function() {
                 var $link = $(this);
                 var href = $link.attr('href').substr(1);
                 if ( href === name ) {
@@ -101,17 +101,15 @@ jQuery(document).ready(function() {
     }
 
     function render_connections() {
-        $('connection').remove();
+        if ( $('connection').length > 0 ) {
+            $('.n-reference').connections('remove');
+        }
         $( '.section .content .n-reference' ).each(function() {
             var classes = $(this).attr('class');
-            // remove n-reference class
+            // get note's referent
             var to = classes.split('n-reference')[0].trim();
             to = to.substr(2);
-            // get note's referent
-            classes = $('.note-' + to).attr("class");
-            var notenum = classes.substr(classes.indexOf("notenum-") + 8).split(' ')[0];
-            // draw connection from $(this) to [to] and add class c- to connection border for color
-            $(this).connections({ to: '.note-' + to});// , 'class': 'c-' + notenum});
+            $(this).connections({ to: '.note-' + to});
         });
     }
 
