@@ -4,9 +4,6 @@
   .info {
     display: none !important;
   }
-  #wrapper {
-    padding: 0px;
-  }
   .ui-resizable-handle {
     display: none !important;
   }
