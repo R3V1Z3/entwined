@@ -210,15 +210,14 @@ jQuery(document).ready(function() {
             render_editor(id);
         });
 
+        // highlight referenced section on reference hover
         $('.n-reference').mouseenter( function(){
-            var bg = $(this).css('background');
             var href = $(this).attr('href');
-            $(href).css( 'background', bg );
+            $(href).css( 'filter', 'invert(100%)' );
         });
         $('.n-reference').mouseleave( function(){
             var href = $(this).attr('href');
-            var bg = $('.section').css('background');
-            $(href).css( 'background', bg );
+            $(href).css( 'filter', 'invert(0%)' );
         });
 
         // target elements with the "draggable" class

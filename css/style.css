@@ -130,7 +130,7 @@ h1 a, h2 a, h3 a {
 }
 
 .section a:hover {
-  background: white;
+  background: rgba(255,255,255,0.6);
   box-shadow: 0 0 6px rgba(255,255,255,0.45);
 }
 
@@ -158,6 +158,7 @@ a.n-reference {
 
 .reference .handle-heading {
   float: left;
+  position: relative;
   margin: 0;
   padding: 0;
 }
