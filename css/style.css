@@ -134,6 +134,13 @@ h1 a, h2 a, h3 a {
   box-shadow: 0 0 6px rgba(255,255,255,0.45);
 }
 
+.section a.n-reference:hover {
+  filter: invert(100%);
+  color: black;
+  border: 1px solid black;
+  border-radius: 0px;
+}
+
 .content h3,
 .content h4,
 .content h5,
