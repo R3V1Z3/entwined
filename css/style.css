@@ -134,6 +134,14 @@ h1 a, h2 a, h3 a {
   box-shadow: 0 0 6px rgba(255,255,255,0.45);
 }
 
+.content h3,
+.content h4,
+.content h5,
+.content h6 {
+  font-weight: normal;
+  margin: 0.5em 0;
+}
+
 .content li::before {
   content: "\27BA ";
   opacity: 0.5;
