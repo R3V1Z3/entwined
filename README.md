@@ -1,5 +1,5 @@
 ## EntwinED
-Modular Markdown editor for Entwine.
+Modular editor for interactive stories using Markdown. Create stories using EntwinED, play them using Entwine.
 - [What’s Entwine?](#about-entwine)
 - [Entine vs EntwinED?](#what-is-the-difference)
 <!-- {left:53px,top:34px,width:246px,height:171px} -->
