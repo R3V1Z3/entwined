@@ -196,6 +196,7 @@ jQuery(document).ready(function() {
     }
 
     function register_events() {
+
         // Key events
         $(document).keyup(function(e) {
             if( e.which == 88 ) {
@@ -204,6 +205,7 @@ jQuery(document).ready(function() {
             }
         });
 
+        // open editor on content click
         $('.content').click(function(){
             var content = '';
             var id = $(this).parent().attr('id');
@@ -241,6 +243,7 @@ jQuery(document).ready(function() {
             }
         });
 
+        // make sections resizable
         interact('.section').resizable({
             preserveAspectRatio: false,
             edges: { left: true, right: true, bottom: true, top: true }
@@ -262,8 +265,64 @@ jQuery(document).ready(function() {
             target.setAttribute('data-y', y);
             render_connections();
         });
+
+        interact('.inner')
+        .on('tap', function (event) {
+          //event.currentTarget.classList.toggle('switch-bg');
+          //event.preventDefault();
+        })
+        .on('doubletap', function (event) {
+            // create new section
+            event.preventDefault();
+            var x = event.clientX;
+            var y = event.clientY;
+            var name = 'New Section';
+            name = unique_name(name);
+            var html = default_section_html(name);
+            $('.inner').append(html);
+            $s = $( '#' + $gd.clean_name(name) );
+            $s.css( { "top": y + 'px', "left": x + 'px' } );
+            $s.css( { "width": '200px', "height": '100px' } );
+            $s.attr( 'data-x', x).attr( 'data-y', y );
+            $s.find('.content').click(function(){
+                var content = '';
+                var id = $(this).parent().attr('id');
+                render_editor(id);
+            });
+        })
+        .on('hold', function (event) {
+            // event.clientX
+        });
+
     }
 
+    function unique_name(prefix) {
+        var x = 1;
+        do {
+            var n = prefix + ' ' + x;
+            // check if id already exists
+            if ( $( '#' + $gd.clean_name(n) ).length === 0 ) {
+                return n;
+            }
+            x++;
+        }
+        while ( x < 200 );
+    }
+
+    function default_section_html(name) {
+        var id = $gd.clean_name(name);
+        var html = '<div class="section heading draggable" id="' + id + '">';
+        html += '<h2 class="handle-heading">';
+        html += '<a class="handle" name="' + id + '">' + name + '</a>'
+        html += '</h2>';
+        html += '<div class="content">';
+        html += '<p>New content</p>';
+        html += '</div>'; // .content
+        html += '</div>'; // .section
+        return html;
+    }
+
+    // drag handler
     function dragMoveListener (event) {
         var target = event.target,
         // keep the dragged position in the data-x/data-y attributes
