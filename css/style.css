@@ -56,7 +56,7 @@ body, html, #wrapper, .container {
 
 .inner {
   height: 1000px;
-  width: 100%;
+  width: 2000px;
 }
 
 .inner::before {

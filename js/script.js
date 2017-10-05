@@ -1,7 +1,12 @@
-/* global jQuery, $, interact */
-jQuery(document).ready(function() {
+var transforms = {
+    'scale': 1, 'translateX': '0px', 'translateY': '0px',
+    'perspective': '400px', 'rotateX': '0deg', 'rotateY': '0deg', 'scaleZ': '1',
+    'rotateZ': '0deg', 'translateZ': '0px'
+};
 
-    var toggle_html='<span class="toggle"></span>';
+var $c; // will hold container where transforms are made
+
+jQuery(document).ready(function() {
 
     // attach the plugin to an element
     $('#wrapper').gitdown( {    'title': 'EntwinED',
@@ -11,11 +16,21 @@ jQuery(document).ready(function() {
     var $gd = $('#wrapper').data('gitdown');
 
     function main() {
+        $c = $('.inner').addClass('inner');
         position_sections();
         configure_sections();
         notize();
         register_events();
         render_connections();
+        update_transform(transforms);
+    }
+
+    function update_transform(t) {
+        var str = '';
+        for ( key in t ) {
+            str += `${key}(${t[key]}) `;
+        }
+        $c.css( 'transform', str );
     }
 
     function position_sections() {
@@ -243,6 +258,19 @@ jQuery(document).ready(function() {
             }
         });
 
+        // target elements with the "draggable" class
+        interact('.inner').draggable({
+            // enable inertial throwing
+            inertia: false,
+
+            // enable autoScroll
+            autoScroll: true,
+
+            // call this function on every dragmove event
+            onmove: dragMoveListener
+
+        });
+
         // make sections resizable
         interact('.section').resizable({
             preserveAspectRatio: false,
@@ -268,32 +296,45 @@ jQuery(document).ready(function() {
 
         interact('.inner')
         .on('tap', function (event) {
-          //event.currentTarget.classList.toggle('switch-bg');
           //event.preventDefault();
         })
         .on('doubletap', function (event) {
             // create new section
             event.preventDefault();
-            var x = event.clientX;
-            var y = event.clientY;
-            var name = 'New Section';
-            name = unique_name(name);
-            var html = default_section_html(name);
-            $('.inner').append(html);
-            $s = $( '#' + $gd.clean_name(name) );
-            $s.css( { "top": y + 'px', "left": x + 'px' } );
-            $s.css( { "width": '200px', "height": '100px' } );
-            $s.attr( 'data-x', x).attr( 'data-y', y );
-            $s.find('.content').click(function(){
-                var content = '';
-                var id = $(this).parent().attr('id');
-                render_editor(id);
-            });
+            create_section(event.pageX, event.pageY);
         })
         .on('hold', function (event) {
             // event.clientX
         });
 
+        // mousewheel zoom handler
+        $('.inner').on('wheel', function(e){
+            var scale = 1;//get_transform('scale');
+            if(e.originalEvent.deltaY < 0) {
+                scale += 0.05;
+            } else{
+                scale -= 0.05;
+            }
+            //update_slider( 'scale', scale );
+            //transform();
+        });
+
+    }
+
+    function create_section(x,y){
+        var name = 'New Section';
+        name = unique_name(name);
+        var html = default_section_html(name);
+        $('.inner').append(html);
+        $s = $( '#' + $gd.clean_name(name) );
+        $s.css( { "top": y + 'px', "left": x + 'px' } );
+        $s.css( { "width": '200px', "height": '100px' } );
+        $s.attr( 'data-x', x).attr( 'data-y', y );
+        $s.find('.content').click(function(){
+            var content = '';
+            var id = $(this).parent().attr('id');
+            render_editor(id);
+        });
     }
 
     function unique_name(prefix) {
@@ -324,17 +365,27 @@ jQuery(document).ready(function() {
 
     // drag handler
     function dragMoveListener (event) {
-        var target = event.target,
+        var target = event.target;
+        var $target = $(target);
+        
         // keep the dragged position in the data-x/data-y attributes
-        x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
-        y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+        var x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx;
+        var y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
 
-        $(target).css('top', y + 'px');
-        $(target).css('left', x + 'px');
+        if ( $target.hasClass('inner') ) {
+            var window_x = $(window).scrollLeft();
+            var window_y = $(window).scrollTop();
+            var x = -(event.dx/2);
+            var y = -(event.dy/2);
+            window.scrollTo(window_x + x, window_y + y);
+        } else {
+            $target.css('top', y + 'px');
+            $target.css('left', x + 'px');
 
-        // update the position attributes
-        target.setAttribute('data-x', x);
-        target.setAttribute('data-y', y);
+            // update the position attributes
+            $target.attr('data-x', x);
+            $target.attr('data-y', y);
+        }
         render_connections();
     }
 
