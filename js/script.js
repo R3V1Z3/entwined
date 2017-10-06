@@ -308,15 +308,19 @@ jQuery(document).ready(function() {
         });
 
         // mousewheel zoom handler
-        $('.inner').on('wheel', function(e){
-            var scale = 1;//get_transform('scale');
-            if(e.originalEvent.deltaY < 0) {
-                scale += 0.05;
+        $('.inner').on('wheel', function(event){
+            event.preventDefault();
+            var scale = transforms['scale'];
+            if(event.originalEvent.deltaY < 0) {
+                transforms['scale'] += 0.05;
             } else{
-                scale -= 0.05;
+                transforms['scale'] -= 0.05;
             }
-            //update_slider( 'scale', scale );
-            //transform();
+            if ( transforms['scale'] < 1 ) {
+                console.log('scale < 1');
+            }
+            update_transform(transforms);
+            render_connections();
         });
 
     }
@@ -375,9 +379,7 @@ jQuery(document).ready(function() {
         if ( $target.hasClass('inner') ) {
             var window_x = $(window).scrollLeft();
             var window_y = $(window).scrollTop();
-            var x = -(event.dx/2);
-            var y = -(event.dy/2);
-            window.scrollTo(window_x + x, window_y + y);
+            window.scrollTo(window_x + event.dx/2, window_y + event.dy/2);
         } else {
             $target.css('top', y + 'px');
             $target.css('left', x + 'px');
