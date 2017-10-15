@@ -17,7 +17,7 @@ Entwine is a player or front-end for progressing through interactive stories. En
 # Examples <!-- {$gd_info} -->
 <!-- {$gd_help_ribbon} -->
 
-Editor for interactive stories
+Modular text processor
 
 Example Gists <!-- {$gd_gist} -->
 - [Await](https://gist.github.com/eb48e3ccd0e0fc6a502a8ebe02a38715) - Simple example via monotony.

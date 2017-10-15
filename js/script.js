@@ -330,7 +330,7 @@ jQuery(document).ready(function() {
         name = unique_name(name);
         var html = default_section_html(name);
         $('.inner').append(html);
-        $s = $( '#' + $gd.clean_name(name) );
+        $s = $( '#' + $gd.clean(name) );
         $s.css( { "top": y + 'px', "left": x + 'px' } );
         $s.css( { "width": '200px', "height": '100px' } );
         $s.attr( 'data-x', x).attr( 'data-y', y );
@@ -346,7 +346,7 @@ jQuery(document).ready(function() {
         do {
             var n = prefix + ' ' + x;
             // check if id already exists
-            if ( $( '#' + $gd.clean_name(n) ).length === 0 ) {
+            if ( $( '#' + $gd.clean(n) ).length === 0 ) {
                 return n;
             }
             x++;
@@ -355,7 +355,7 @@ jQuery(document).ready(function() {
     }
 
     function default_section_html(name) {
-        var id = $gd.clean_name(name);
+        var id = $gd.clean(name);
         var html = '<div class="section heading draggable" id="' + id + '">';
         html += '<h2 class="handle-heading">';
         html += '<a class="handle" name="' + id + '">' + name + '</a>'
