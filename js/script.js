@@ -209,14 +209,19 @@ jQuery(document).ready(function () {
     }
 
     function render_connections() {
-        if ( $(' connection').length > 0 ) {
-            $(' .n-reference').connections('remove');
+        if ( $('connection').length > 0 ) {
+            $('.n-reference').connections('remove');
         }
-        $(' .section .content .n-reference').each(function () {
-            var classes = $(this).attr('class');
-            // get note's referent
-            var to = classes.split('n-reference')[0].trim();
-            to = to.substr(2);
+        $(eid + ' .section .content .n-reference').each(function () {
+            // extract class this links to
+            var classes = $(this).attr('class').split(' ');
+            var to = '';
+            for ( var i = 0; i < classes.length; i++ ) {
+                var c = classes[i];
+                if ( c !== 'n-reference' && c.indexOf('n-') > -1 ) {
+                    to = c.substr(2);
+                }
+            }
             $(this).connections({ to: '.note-' + to });
         });
     }
@@ -286,7 +291,7 @@ jQuery(document).ready(function () {
         html += `<pre class="md content">${content}</pre>`;
         html += '<textarea class="editor-content" />';
         html += '</div>';
-        $(eid_inner).append(html);
+        $s.after(html);
         var $editor = $('.editor');
         $editor.css({
             top: top, left: left + width + 50,
@@ -304,28 +309,35 @@ jQuery(document).ready(function () {
             render_connections();
         });
 
-        // event handler for editor content changes
+        // event handler for editor heading changes
         $(eid + ' .editor-heading').on('keyup change', function () {
             content = $('.editor-heading').val();
-            var clean = $gd.clean(content);
-            var html = `<a class="handle" name="${clean}">${content}</a>`;
-            var $s = $(eid + ` .section#${id}`);
+            var new_id = $gd.clean(content);
+            
+            // get id of the section linked with this editor
+            var $editor_section = $(this).parent().prev();
+            var prev_id = $editor_section.attr('id');
+            if ( $editor_section.hasClass('note') ) {
+                $editor_section.removeClass(`note-${prev_id}`);
+                $editor_section.addClass(`note-${new_id}`);
+            }
+            $editor_section.attr('id', new_id);
+            var html = `<a class="handle" name="${new_id}">${content}</a>`;
+            var $s = $(eid + ` .section#${new_id}`);
             $s.find('.handle-heading').html(html);
-            // todo
-            //$s.attr( 'id', clean );
+            $(this).parent().attr('data-section', new_id);
 
-            // update links
-            // $(eid + ` a`).each(function(){
-            //     var href = $(this).attr('href');
-            //     console.log(href,id);
-            //     if ( href === id ) {
-            //         console.log(href);
-            //         //$(this).attr('href', '#' + id);
-            //     }
-            // });
-            //.attr( 'href', '#' + clean );
+            // update all links to this section
+            var $l = $(eid + ` a[href=#${prev_id}]`);
+            $l.attr('href', '#' + new_id);
+            $l.removeClass(`n-${prev_id}`);
+            if ( $l.hasClass('n-reference') ) {
+                $l.addClass(`n-${new_id}`);
+            }
+            // update toc link
+            var $toc_link = $(eid + ` .info .toc a[href=#${new_id}]`);
+            $toc_link.text(content);
 
-            // update all links on page
             notize();
             render_connections();
         });
@@ -529,9 +541,9 @@ jQuery(document).ready(function () {
             } else {
                 scale -= 20;
             }
-            if (scale < -300) {
-                scale = -300;
-            }
+            if (scale < -300) scale = -300;
+            if (scale > 300) scale = 300;
+            console.log(scale);
 
             // center scale on cursor position
             var x = event.originalEvent.offsetX;
