@@ -53,8 +53,13 @@ jQuery(document).ready(function () {
         // account for scaling
         var scale = parseFloat(t['translateZ']) / 100;
 
+        // ensure we stay in bounds
         if ( x > 0 ) x = 0;
         if ( y > 0 ) y = 0;
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        if ( x < -w ) x = -w;
+        if ( y < -h ) y = -h;
         
         t['translateX'] = x + 'px';
         t['translateY'] = y + 'px';
@@ -172,7 +177,7 @@ jQuery(document).ready(function () {
         $(eid + ' .section').each(function () {
 
             var $s = $(this);
-            $s.addClass('no-transition draggable');
+            $s.addClass('no-transition');
 
             // set initial position values
             var x = $s.css('left').slice(0, -2);
@@ -400,11 +405,6 @@ jQuery(document).ready(function () {
         $s.css({ "top": y + 'px', "left": x + 'px' });
         $s.css({ "width": '200px', "height": '100px' });
         $s.attr('data-x', x).attr('data-y', y);
-        $s.find('.content').click(function () {
-            var content = '';
-            var id = $(this).parent().attr('id');
-            render_editor(id);
-        });
         var s = $gd.get_sections();
         s.push(name);
         $gd.set_sections(s);
@@ -427,7 +427,7 @@ jQuery(document).ready(function () {
 
     function default_section_html(name) {
         var id = $gd.clean(name);
-        var html = '<div class="section heading draggable no-transition" id="' + id + '">';
+        var html = '<div class="section heading no-transition" id="' + id + '">';
         html += '<h2 class="handle-heading">';
         html += '<a class="handle" name="' + id + '">' + name + '</a>'
         html += '</h2>';
@@ -488,6 +488,7 @@ jQuery(document).ready(function () {
 
         // click handler for local links, incuding toc links
         $(eid + ' a[href^=#]').click(function (e) {
+            e.preventDefault();
             var id = this.getAttribute('href').substr(1);
             activate_section(id);
             transform_focus(id);
@@ -511,11 +512,11 @@ jQuery(document).ready(function () {
         // highlight referenced section on reference hover
         $('.n-reference').mouseenter(function () {
             var href = $(this).attr('href');
-            //$(href).css( 'filter', 'invert(100%)' );
+            $(href).css( 'filter', 'invert(100%)' );
         });
         $('.n-reference').mouseleave(function () {
             var href = $(this).attr('href');
-            //$(href).css( 'filter', 'invert(0%)' );
+            $(href).css( 'filter', 'invert(0%)' );
         });
 
         // mousewheel zoom handler
@@ -528,8 +529,8 @@ jQuery(document).ready(function () {
             } else {
                 scale -= 20;
             }
-            if (scale < -500) {
-                scale = -500;
+            if (scale < -300) {
+                scale = -300;
             }
 
             // center scale on cursor position
@@ -615,7 +616,7 @@ jQuery(document).ready(function () {
             })
             .resizable({
                 preserveAspectRatio: false,
-                edges: { left: true, right: true, bottom: true, top: true }
+                edges: { left: false, right: true, bottom: true, top: false }
             })
             .on('resizemove', function (event) {
                 var target = event.target,
@@ -642,7 +643,6 @@ jQuery(document).ready(function () {
                 render_connections();
             })
             .on('doubletap', function (event) {
-                //var id = event.target;//.getAttribute('id');
                 var id = $(event.target).closest('.section').attr('id');
                 render_editor(id);
                 transform_focus(id);
